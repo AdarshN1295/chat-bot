@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http, {
     cors: {
-        origin: "*", // Allow any origin for testing; restrict in production
+        origin: "*", // Allow all origins for testing; restrict in production
         methods: ["GET", "POST"]
     }
 });
@@ -21,14 +21,21 @@ app.get('/', (req, res) => {
 const users = {};
 
 io.on('connection', (socket) => {
+    // User joins the chat
     socket.on('new-user-joined', (namee) => {
-        console.log('New User', namee);
         users[socket.id] = namee;
         socket.broadcast.emit('user-joined', namee);
     });
 
+    // User sends a message
     socket.on('send', (message) => {
         socket.broadcast.emit('receive', { message: message, namee: users[socket.id] });
+    });
+
+    // User disconnects
+    socket.on('disconnect', () => {
+        socket.broadcast.emit('left', users[socket.id]);
+        delete users[socket.id];
     });
 });
 
