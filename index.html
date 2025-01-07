@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AB Web Chat</title>
     <script defer src="http://localhost:8000/socket.io/socket.io.js"></script>
+    <script defer src="/js/client.js"></script>
     <style>
         *{
     margin: 0;
@@ -115,44 +116,5 @@ img{
         </form>
     </div>
 </div>
-
-<script>
-    const socket = io('http://localhost:8000');
-
-const form = document.getElementById('send-container');
-const messageInput = document.getElementById('messageInput');
-const messageContainer = document.getElementById('content-container');
-
-const append = (message, position)=>{
-    const messageElement = document.createElement('div');
-    messageElement.innerText = message;
-    messageElement.classList.add('message');
-    messageElement.classList.add(position);
-    messageContainer.appendChild(messageElement)
-}
-
-form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const message = messageInput.value;
-    append(`You: ${message}`, "right")
-    socket.emit('send', message);
-    messageInput.value = '';
-})
-
-const namee = prompt('enter your name');
-socket.emit('new-user-joined', namee);
-
-socket.on('user-joined', namee=>{
-    append(`${namee} is joined the chat`, 'right')
-})
-
-socket.on('receive', data=>{
-    append(`${data.namee}: ${data.message}`, 'left')
-})
-
-socket.on('left', namee=>{
-    append(`${namee} left the chat`, 'left')
-})
-</script>
 </body>
 </html>
