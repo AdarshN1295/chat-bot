@@ -5,8 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AB Web Chat</title>
     <script defer src="http://localhost:8000/socket.io/socket.io.js"></script>
-    <script defer src="js/client.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        *{
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    box-sizing: border-box;}
+
+:root{
+    --color: #07363c;
+}
+
+body,html{
+    height: 100%;
+    background-color: #07363c;}
+
+.headerblock{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: max-content;}
+
+img{
+    width: 20%;}
+
+.lowerblock{
+    width: 100%;
+    height: 80%;}
+
+.input-box{
+    padding: 10px;
+    overflow-y: scroll;
+    border-radius: 20px;
+    background-color: white;
+    margin: 0 auto;
+    width: 80%;
+    height: 80%;}
+
+.buttons-box,
+#send-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    margin: 10px auto;}
+
+.left{
+    position: relative;
+    margin: 10px 0;
+    float: left;
+    clear: both;}
+
+.right{
+    position: relative;
+    margin: 10px 0;
+    float: right;
+    clear: both;}
+
+.time{
+    font-size: 10px;
+    position: absolute;
+    right: 5px;
+    bottom: 2px;
+}
+
+.message-inp{
+    border-radius: 10px;
+    border: 1px solid black;
+    padding: 10px 10px;
+    width: 80%;}
+
+.message{
+    background-color: #07363c;
+    color: white;
+    border-radius: 10px;
+    padding: 10px 20px;
+    width: 24%;}
+
+.btn{
+    transition: all 0.4s ease;
+    font-size: 18px;
+    text-transform: uppercase;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px 10px;
+    width: 18%;}
+
+.btn:hover{
+    background-color: var(--color);
+    color: white;
+    border: 1px solid white;
+}
+
+    </style>
 </head>
 <body>
     
@@ -24,6 +116,43 @@
     </div>
 </div>
 
+<script>
+    const socket = io('http://localhost:8000');
 
+const form = document.getElementById('send-container');
+const messageInput = document.getElementById('messageInput');
+const messageContainer = document.getElementById('content-container');
+
+const append = (message, position)=>{
+    const messageElement = document.createElement('div');
+    messageElement.innerText = message;
+    messageElement.classList.add('message');
+    messageElement.classList.add(position);
+    messageContainer.appendChild(messageElement)
+}
+
+form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const message = messageInput.value;
+    append(`You: ${message}`, "right")
+    socket.emit('send', message);
+    messageInput.value = '';
+})
+
+const namee = prompt('enter your name');
+socket.emit('new-user-joined', namee);
+
+socket.on('user-joined', namee=>{
+    append(`${namee} is joined the chat`, 'right')
+})
+
+socket.on('receive', data=>{
+    append(`${data.namee}: ${data.message}`, 'left')
+})
+
+socket.on('left', namee=>{
+    append(`${namee} left the chat`, 'left')
+})
+</script>
 </body>
 </html>
