@@ -15,7 +15,7 @@ app.use(express.static(__dirname + '/../'));
 
 // Serve index.html at the root URL
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + './index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 const users = {};
